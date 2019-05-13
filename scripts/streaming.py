@@ -2,7 +2,7 @@
 """
 Created on Mon Apr 22 19:28:33 2019
 
-This script sets up tweepy and hears tweeter streams
+This script sets up tweepy and hears twitter streams
 
 @author: Shihao Ran
          STIM Laboratory
@@ -12,6 +12,7 @@ from tweepy import OAuthHandler
 from tweepy import API
 from tweepy import Stream
 from slistener import SListener
+from urllib3.exceptions import ProtocolError
 
 #%%
 # consumer key authentication
@@ -31,10 +32,14 @@ api = API(auth)
 
 #%%
 # set up words to hear
-keywords_to_hear = ['#LeagueOfLegends',
+keywords_to_hear = ['#GrandTheftAutoV',
+                    '#LeagueOfLegends',
                     '#Fortnite',
+                    '#dota2',
+                    '#CSGO',
                     '#ApexLegends',
-                    '#Hearthstone']
+                    '#Hearthstone',
+                    '#overwatch']
 
 # instantiate the SListener object
 listen = SListener(api)
@@ -45,4 +50,9 @@ stream = Stream(auth, listen)
 #%%
 
 # begin collecting data
-stream.filter(track=keywords_to_hear)
+while True:
+    try:
+        stream.filter(track=keywords_to_hear)
+    
+    except (ProtocolError, AttributeError):
+        continue

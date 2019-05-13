@@ -1,17 +1,25 @@
 # -*- coding: utf-8 -*-
+"""
+this script defines the streaming behavior passed to tweepy
 
+@author: Shihao Ran
+         STIM Laboratory
+"""
+
+# import packages
 from tweepy.streaming import StreamListener
 import json
 import time
 import sys
 
+# inherit from StreamListener class
 class SListener(StreamListener):
     def __init__(self, api = None, fprefix = 'streamer'):
+        # define the filename with time as prefix
         self.api = api or API()
         self.counter = 0
         self.fprefix = fprefix
         self.output  = open('%s_%s.json' % (self.fprefix, time.strftime('%Y%m%d-%H%M%S')), 'w')
-
 
     def on_data(self, data):
         if  'in_reply_to_status' in data:
@@ -28,8 +36,9 @@ class SListener(StreamListener):
             print("WARNING: %s" % warning['message'])
             return
 
-
     def on_status(self, status):
+        # if the number of tweets reaches 20000
+        # create a new file
         self.output.write(status)
         self.counter += 1
         if self.counter >= 20000:
@@ -37,7 +46,6 @@ class SListener(StreamListener):
             self.output  = open('%s_%s.json' % (self.fprefix, time.strftime('%Y%m%d-%H%M%S')), 'w')
             self.counter = 0
         return
-
 
     def on_delete(self, status_id, user_id):
         print("Delete notice")
