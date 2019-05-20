@@ -2,7 +2,8 @@
 """
 Created on Tue May  7 12:25:17 2019
 
-this script visualize dataframes
+this script visualize the number of tweets for all the games
+with stacked bar chart, different types of tweets are highlighted
 
 @author: Shihao Ran
          STIM Laboratory
@@ -20,8 +21,10 @@ from bokeh.plotting import figure
 from bokeh.layouts import column
 
 #%%
+# load the dataframe
 df = pd.read_csv(r'.\dataframes\hashtags_48_with_quoted_or_retweeted.csv')
 #%%
+# specify the games and types
 games = ['GrandTheftAutoV',
         'LeagueOfLegends',
         'Fortnite',
@@ -36,6 +39,7 @@ types = ['quote', 'retweet', 'original']
 #colors = [Blues3, Greens3, Oranges3, Reds3,
 #          BuPu3, PuRd3, Purples3, YlGnBu3]
 
+# count the numbers of different types of games
 original = []
 retweets = []
 quoted = []
@@ -44,15 +48,19 @@ for game in games:
     retweets.append(df['if_retweeted'][(df.game==game) & (df.if_retweeted==True)].sum())
     quoted.append(df['if_quoted'][(df.game==game) & (df.if_quoted==True)].sum())
 
+# scale the numbers by a log10 function
 original_scaled = np.log10(original)
 retweets_scaled = np.log10(retweets)
 quoted_scaled = np.log10(quoted)
 
+# calculate the total number of tweets
 total = [original[i] + retweets[i] + quoted[i] for i in range(len(original))]
 
+# sort the names
 sorted_games = sorted(games, key=lambda x: total[games.index(x)])
 #%%
 
+# plot the figures
 output_file("game_dist_bar_fancy.html")
 
 before_scale = {'games' : games,
@@ -92,8 +100,4 @@ p2.ygrid.grid_line_color = None
 p2.legend.location = "bottom_right"
 p2.axis.minor_tick_line_color = None
 p2.outline_line_color = None
-#p2.xaxis[0].formatter = NumeralTickFormatter(format="10**")
-
-
 show(column(p1, p2))
-#%%

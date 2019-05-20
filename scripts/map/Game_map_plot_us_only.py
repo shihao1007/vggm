@@ -2,15 +2,9 @@
 """
 Created on Sat May 18 00:25:48 2019
 
-@author: Shihao Ran
-         STIM Laboratory
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue May  7 20:38:19 2019
-
-this script plot the map of games
+this script plot the map for all the games
+but by default only shows the US region
+please refer to the complete version for detailed comments
 
 @author: Shihao Ran
          STIM Laboratory
@@ -111,7 +105,7 @@ def add_xy_col(df):
     return df
 
 #%%
-    
+
 games = ['overwatch',
         'Fortnite',
         'ApexLegends',
@@ -145,7 +139,7 @@ colors = ['#ffa42d',#Overwatch
 plot = figure(plot_width=1000, plot_height=550,
            x_range=(-14000000, -7500000), y_range=(2500000, 6500000),
            x_axis_type="mercator", y_axis_type="mercator",
-           tools="hover, pan, box_zoom, wheel_zoom, reset", 
+           tools="hover, pan, box_zoom, wheel_zoom, reset",
            tooltips=[('user id', '@user_id'),
                      ('game', '@game'),
                      ('location', '@name'),

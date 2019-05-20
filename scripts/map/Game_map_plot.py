@@ -2,7 +2,8 @@
 """
 Created on Tue May  7 20:38:19 2019
 
-this script plot the map of games
+this script plot the map for all the games except for GTA5
+since GTA5 does not have a tweet with geo location enabled.
 
 @author: Shihao Ran
          STIM Laboratory
@@ -103,7 +104,7 @@ def add_xy_col(df):
     return df
 
 #%%
-    
+# the name of the games to be visualized
 games = ['overwatch',
         'Fortnite',
         'ApexLegends',
@@ -112,19 +113,7 @@ games = ['overwatch',
         'dota2',
         'LeagueOfLegends']
 
-df = pd.read_csv(r'./dataframes/place_tweet_id_with_text.csv')
-#%%
-df = get_lon_lat(df, 'place')
-#%%
-df = add_xy_col(df)
-df['game_colors'] = df.game.apply(lambda x: {games[i]:colors[i] for i in range(len(games))}[x])
-
-#%%
-df['circle_size'] = df.followers_count.apply(lambda x: min(30, x/(x+2000) * 30))
-#%%
-df = df.set_index('created_at')
-
-#%%
+# the color of the games to be visualized
 colors = ['#ffa42d',#Overwatch
           '#9e3bd3',#Fortnite
           '#d23a3a',#ApexLegends
@@ -133,12 +122,26 @@ colors = ['#ffa42d',#Overwatch
           '#632020',#dota2
           '#2cb4cc',#LeagueOfLegends
           ]
-#%%
+
+# load the dataframe
+df = pd.read_csv(r'./dataframes/place_tweet_id_with_text.csv')
+# add longitude and latitude information into the dataframe
+df = get_lon_lat(df, 'place')
+# convert longitude and latitude into x and y coordinates in
+# Mercator projected coordinate system
+df = add_xy_col(df)
+# add color information mapped by game names
+df['game_colors'] = df.game.apply(lambda x: {games[i]:colors[i] for i in range(len(games))}[x])
+# add circle size mapped by followers_count
+df['circle_size'] = df.followers_count.apply(lambda x: min(30, x/(x+2000) * 30))
+# set the datetime as index
+df = df.set_index('created_at')
+
 # this map is initialized to include the whole earth
 plot = figure(plot_width=1000, plot_height=550,
            x_range=(-20000000, 20000000), y_range=(-7000000, 7000000),
            x_axis_type="mercator", y_axis_type="mercator",
-           tools="hover, pan, box_zoom, wheel_zoom, reset", 
+           tools="hover, pan, box_zoom, wheel_zoom, reset",
            tooltips=[('user id', '@user_id'),
                      ('game', '@game'),
                      ('location', '@name'),
@@ -148,6 +151,7 @@ plot = figure(plot_width=1000, plot_height=550,
 CARTODBPOSITRON = get_provider(Vendors.CARTODBPOSITRON)
 plot.add_tile(CARTODBPOSITRON)
 
+# create a column data source
 source = ColumnDataSource(data = {'x': df.merc_x,
                                   'y': df.merc_y,
                                   'size': df.circle_size,
@@ -157,15 +161,16 @@ source = ColumnDataSource(data = {'x': df.merc_x,
                                   'game': df.game,
                                   'color': df.game_colors})
 
-
 # add circles to the map
 plot.circle(x='x', y='y', size='size',
             color='color',
             legend = 'game',
             source=source, alpha=0.5)
 
+# set legend positions
 plot.legend.orientation = "horizontal"
 plot.legend.location = "bottom_center"
 
+# output the file
 output_file('game_map48.html')
 show(plot)
