@@ -16,14 +16,14 @@ from urllib3.exceptions import ProtocolError
 
 #%%
 # consumer key authentication
-consumer_key = 'vSRCw398hv3Wf03rYEXCNrepJ'
-consumer_secret = 'zBbbzg4UnuFbWlNOvh2LBTbvFpkWQauaOELNyYcXim6wSyghop'
+consumer_key = 'YOUR CONSUMER KEY'
+consumer_secret = 'YOUR CONSUMER SECRET'
 
 auth = OAuthHandler(consumer_key, consumer_secret)
 #%%
 # access key authentication
-access_token = '4790635572-B9cSQdBJr8GofKHubTpU7oe0yBBcEwvTrJ5gUro'
-access_token_secret = 'ktaaQc9fX5rZ4oF15NQZeeQ18sr3mL4rcIXBXoRir6uLs'
+access_token = 'YOUR ACCESS TOKEN'
+access_token_secret = 'YOUR ACCESS SECRET'
 
 auth.set_access_token(access_token, access_token_secret)
 #%%
