@@ -201,11 +201,17 @@ def json2df(filename):
     """
     coor_df = tweets_2dict_lst[0]
     
-    coor_df = expand_dict(coor_df)
+    if len(coor_df)==0:
+        
+        to_sql['coordinates'] = pd.DataFrame()
+        
+    else:
     
-    list_col_to_str_col(coor_df)
-    
-    to_sql['coordinates'] = coor_df
+        coor_df = expand_dict(coor_df)
+        
+        list_col_to_str_col(coor_df)
+        
+        to_sql['coordinates'] = coor_df
     
     """
     2.2 entities
@@ -325,26 +331,33 @@ def json2df(filename):
     """
     # handle place dataframe
     place_df = tweets_2dict_lst[4]
-    # expand it first
-    place_df = expand_dict(place_df).drop(['attributes'], axis=1)
     
-    # note that bounding box column contains dictionarys
-    # make it a new dataframe into two columns
-    bounding_box_lst = place_df.loc[:, 'bounding_box'].copy().tolist()
-    bounding_box_df = pd.DataFrame(bounding_box_lst,
-                                   index=place_df.index)
-    bounding_box_df.rename(columns={'coordinates': 'bounding_box_coordinates',
-                                    'type': 'bounding_box_type'})
+    if len(place_df)==0:
+        
+        to_sql['place'] = pd.DataFrame()
+        
+    else:
     
-    # then merge it back and drop the original one
-    place_df = pd.concat([place_df, bounding_box_df], axis=1)
-    place_df.drop(['bounding_box'], axis=1, inplace=True)
-    
-    # convert list to str
-    list_col_to_str_col(place_df)
-    
-    # add to list
-    to_sql['place'] = place_df
+        # expand it first
+        place_df = expand_dict(place_df).drop(['attributes'], axis=1)
+        
+        # note that bounding box column contains dictionarys
+        # make it a new dataframe into two columns
+        bounding_box_lst = place_df.loc[:, 'bounding_box'].copy().tolist()
+        bounding_box_df = pd.DataFrame(bounding_box_lst,
+                                       index=place_df.index)
+        bounding_box_df.rename(columns={'coordinates': 'bounding_box_coordinates',
+                                        'type': 'bounding_box_type'})
+        
+        # then merge it back and drop the original one
+        place_df = pd.concat([place_df, bounding_box_df], axis=1)
+        place_df.drop(['bounding_box'], axis=1, inplace=True)
+        
+        # convert list to str
+        list_col_to_str_col(place_df)
+        
+        # add to list
+        to_sql['place'] = place_df
     
     """
     2.7 user
@@ -373,10 +386,11 @@ def json2df(filename):
     """
     # for each dataframe in the list
     for df_name, df in to_sql.items():
-        if 'created_at' in df.columns:
-            df.created_at = pd.to_datetime(df.created_at)
-        df.drop_duplicates(inplace=True)
-    
+        if len(df) != 0:
+            if 'created_at' in df.columns:
+                df.created_at = pd.to_datetime(df.created_at)
+            df.drop_duplicates(inplace=True)
+        
     return to_sql
     
 #%%
